@@ -40,9 +40,36 @@ int main(int argc, char** argv) {
 	
 }
 
-cv::Mat to442_grayscale(const cv::Mat& rgbImage) {
-	
-	}
+cv::Mat to_442_grayscale(const cv::Mat& rgbImage)
+{
+    cv::Size sz = image.size();
+    int imageWidth = sz.width;
+    int imageHeight = sz.height;
+
+    int i = 0; // width (column) index
+    int j = 0; // height (row) index
+    for (i = 0; i < imageWidth; i++)
+    {
+        for (j = 0; j < imageHeight; j++)
+        {
+            cv::Vec3b pixel = rgbImage.at<cv::Vec3b>(j, i); // Vec<uchar, 3>
+            uchar blue = pixel[0];
+            uchar green = pixel[1];
+            uchar red = pixel[2];
+            
+            blue = blue * BLUE;
+            green = green * GREEN;
+            red = red * RED;
+
+            pixel[0] = blue;
+            pixel[1] = green;
+            pixel[2] = red;
+
+            rgbImage.at<cv::Vec3b>(j, i) = pixel;
+        }
+    }
+    return rbgImage;
+}
 
 cv::Mat to442_sobel(const cv::Mat& grayscaleImage) {
 	
