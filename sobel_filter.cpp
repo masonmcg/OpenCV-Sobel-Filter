@@ -4,6 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define RED 0.2126
+#define GREEN 0.7152
+#define BLUE 0.0722
+
+#define ESC 27
+
+cv::Mat to442_grayscale(cv::Mat& rgbImage);
+cv::Mat to442_sobel(cv::Mat& grayscaleImage);
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <video_file>" << std::endl;
@@ -24,13 +33,14 @@ int main(int argc, char** argv) {
 			break;
 			
 		cv::Mat grayscale = to442_grayscale(frame);
+		cv::imshow("Processed Frame", grayscale);
 		
-		cv::Mat sobelFiltered = to442_sobel(grayscale);
+		//cv::Mat sobelFiltered = to442_sobel(grayscale);
 		
-		cv::imshow("Processed Frame", sobelFiltered);
+		//cv::imshow("Processed Frame", sobelFiltered);
 		
 		int key = cv::waitKey(30);
-		if (key == 27)
+		if (key == ESC)
 			break;
 		
 	}
@@ -40,9 +50,9 @@ int main(int argc, char** argv) {
 	
 }
 
-cv::Mat to_442_grayscale(const cv::Mat& rgbImage)
-{
-    cv::Size sz = image.size();
+cv::Mat to442_grayscale(cv::Mat& rgbImage)
+{	
+    cv::Size sz = rgbImage.size();
     int imageWidth = sz.width;
     int imageHeight = sz.height;
 
@@ -52,7 +62,7 @@ cv::Mat to_442_grayscale(const cv::Mat& rgbImage)
     {
         for (j = 0; j < imageHeight; j++)
         {
-            cv::Vec3b pixel = rgbImage.at<cv::Vec3b>(j, i); // Vec<uchar, 3>
+            cv::Vec3b& pixel = rgbImage.at<cv::Vec3b>(j, i); // Vec<uchar, 3>
             uchar blue = pixel[0];
             uchar green = pixel[1];
             uchar red = pixel[2];
@@ -60,17 +70,19 @@ cv::Mat to_442_grayscale(const cv::Mat& rgbImage)
             blue = blue * BLUE;
             green = green * GREEN;
             red = red * RED;
+            
+            uchar gray = blue + green + red;
 
-            pixel[0] = blue;
-            pixel[1] = green;
-            pixel[2] = red;
+            pixel[0] = gray;
+            pixel[1] = gray;
+            pixel[2] = gray;
 
-            rgbImage.at<cv::Vec3b>(j, i) = pixel;
+            //rgbImage.at<cv::Vec3b>(j, i) = pixel;
         }
     }
-    return rbgImage;
+    return rgbImage;
 }
 
-cv::Mat to442_sobel(const cv::Mat& grayscaleImage) {
+cv::Mat to442_sobel(cv::Mat& grayscaleImage) {
 	
 	}
