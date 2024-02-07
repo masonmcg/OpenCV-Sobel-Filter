@@ -85,6 +85,7 @@ cv::Mat to442_grayscale(cv::Mat& rgbImage)
     return rgbImage;
 }
 
+
 cv::Mat to442_sobel(cv::Mat& grayscaleImage) {
     cv::Size sz = grayscaleImage.size();
     int imageWidth = sz.width;
@@ -96,11 +97,13 @@ cv::Mat to442_sobel(cv::Mat& grayscaleImage) {
 
     int i = 0; // width (column) index
     int j = 0; // height (row) index
+    
+    // create sobel image
+    cv::Mat sobelImage(imageHeight, imageWidth, CV_8UC3);
     for (i = 1; i < imageWidth - 1; i++)
     {
         for (j = 1; j < imageHeight - 1; j++)
         {
-			cv::Vec3b& pixel = grayscaleImage.at<cv::Vec3b>(j, i); // Vec<uchar, 3>
             int index = 0;
             for (int dj = -1; dj <= 1; ++dj) 
             {
@@ -124,12 +127,12 @@ cv::Mat to442_sobel(cv::Mat& grayscaleImage) {
 			}
 			
 			int sum = abs(gx_sum) + abs(gy_sum);
+			
+			// Clamp sum value to 255
+            sum = std::min(sum, 255);
 
-            pixel[0] = sum;
-            pixel[1] = sum;
-            pixel[2] = sum;
-
+            sobelImage.at<cv::Vec3b>(j, i) = cv::Vec3b(sum, sum, sum);
         }
     }
-    return grayscaleImage;
+    return sobelImage;
 }
