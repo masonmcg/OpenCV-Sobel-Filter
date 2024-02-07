@@ -10,6 +10,9 @@
 
 #define ESC 27
 
+#define GX {1, 0, -1, 2, 0, -2, 1, 0, -1}
+#define GY {1, 2, 1, 0, 0, 0, -1, -2, -1}
+
 cv::Mat to442_grayscale(cv::Mat& rgbImage);
 cv::Mat to442_sobel(cv::Mat& grayscaleImage);
 
@@ -33,11 +36,11 @@ int main(int argc, char** argv) {
 			break;
 			
 		cv::Mat grayscale = to442_grayscale(frame);
-		cv::imshow("Processed Frame", grayscale);
+		//cv::imshow("Processed Frame", grayscale);
 		
-		//cv::Mat sobelFiltered = to442_sobel(grayscale);
+		cv::Mat sobelFiltered = to442_sobel(grayscale);
 		
-		//cv::imshow("Processed Frame", sobelFiltered);
+		cv::imshow("Processed Frame", sobelFiltered);
 		
 		int key = cv::waitKey(30);
 		if (key == ESC)
@@ -77,12 +80,56 @@ cv::Mat to442_grayscale(cv::Mat& rgbImage)
             pixel[1] = gray;
             pixel[2] = gray;
 
-            //rgbImage.at<cv::Vec3b>(j, i) = pixel;
         }
     }
     return rgbImage;
 }
 
 cv::Mat to442_sobel(cv::Mat& grayscaleImage) {
-	
-	}
+    cv::Size sz = grayscaleImage.size();
+    int imageWidth = sz.width;
+    int imageHeight = sz.height;
+    
+    int gx[] = GX;
+    int gy[] = GY;
+    int grayValues[9];
+
+    int i = 0; // width (column) index
+    int j = 0; // height (row) index
+    for (i = 1; i < imageWidth - 1; i++)
+    {
+        for (j = 1; j < imageHeight - 1; j++)
+        {
+			cv::Vec3b& pixel = grayscaleImage.at<cv::Vec3b>(j, i); // Vec<uchar, 3>
+            int index = 0;
+            for (int dj = -1; dj <= 1; ++dj) 
+            {
+                for (int di = -1; di <= 1; ++di) 
+                {
+                    int nj = j + dj;
+                    int ni = i + di;
+
+                    grayValues[index] = grayscaleImage.at<cv::Vec3b>(nj, ni)[0];
+                    index++;
+                }      
+            }
+            
+            int gx_sum = 0;
+            int gy_sum = 0;
+            
+            for (index = 0; index < 9; index++) 
+            {
+				gx_sum += gx[index] * grayValues[index];
+				gy_sum += gy[index] * grayValues[index];
+			}
+			
+			int sum = abs(gx_sum) + abs(gy_sum);
+
+            pixel[0] = sum;
+            pixel[1] = sum;
+            pixel[2] = sum;
+
+        }
+    }
+    return grayscaleImage;
+}
